@@ -51,13 +51,18 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { title } = req.body;
+    const { title, dueDate, priority } = req.body;
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
     }
 
     const todo = await prisma.todo.create({
-      data: { title, userId },
+      data: {
+        title,
+        userId,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        priority: priority ?? "medium",
+      },
     });
 
     res.status(201).json({

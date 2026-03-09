@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:reset": "prisma migrate reset",
     "prisma:studio": "prisma studio",
     "lint": "tsc --noEmit",
     "test": "echo \"No tests yet\""
