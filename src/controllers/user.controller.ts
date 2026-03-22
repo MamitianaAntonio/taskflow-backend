@@ -15,6 +15,7 @@ export const registerUserController = async (req: Request, res: Response) => {
       message: "User registered successfully",
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
       },
     });
@@ -34,6 +35,7 @@ export const loginUserController = async (req: Request, res: Response) => {
       user: {
         id: user.id,
         email: user.email,
+        name: user.name,
       },
     });
   } catch (error) {
@@ -88,4 +90,3 @@ export const updatePasswordController = async (req: Request, res: Response) => {
     });
   }
 };
-
