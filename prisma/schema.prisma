@@ -15,9 +15,16 @@ model UserAccount {
   todos    Todo[]
 }
 
+enum TodoStatus {
+  todo
+  doing
+  done
+}
+
 model Todo {
   id        Int         @id @default(autoincrement())
   title     String
+  status    TodoStatus  @default(todo)
   completed Boolean     @default(false)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
