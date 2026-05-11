@@ -47,19 +47,30 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
   }
 };
 
+const todoStatuses = ["todo", "doing", "done"] as const;
+
+type TodoStatus = (typeof todoStatuses)[number];
+
 // create a new todo
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { title, dueDate, priority } = req.body;
+    const { title, dueDate, priority, status } = req.body;
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
+    }
+
+    if (status !== undefined && !todoStatuses.includes(status)) {
+      return res.status(400).json({
+        error: `Status must be one of: ${todoStatuses.join(", ")}`,
+      });
     }
 
     const todo = await prisma.todo.create({
       data: {
         title,
         userId,
+        status: status ?? "todo",
         dueDate: dueDate ? new Date(dueDate) : null,
         priority: priority ?? "medium",
       },
@@ -79,7 +90,13 @@ export const updateTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
     const { id } = req.params;
-    const { title, completed } = req.body;
+    const { title, status, dueDate, priority } = req.body;
+
+    if (status !== undefined && !todoStatuses.includes(status)) {
+      return res.status(400).json({
+        error: `Status must be one of: ${todoStatuses.join(", ")}`,
+      });
+    }
 
     const todo = await prisma.todo.findUnique({
       where: { id: parseInt(id) },
@@ -93,9 +110,27 @@ export const updateTodo = async (req: Request, res: Response) => {
       });
     }
 
+    const data: {
+      title?: string;
+      status?: TodoStatus;
+      dueDate?: Date | null;
+      priority?: string;
+    } = {};
+
+    if (title !== undefined) data.title = title;
+    if (status !== undefined) data.status = status;
+    if (dueDate !== undefined) data.dueDate = dueDate ? new Date(dueDate) : null;
+    if (priority !== undefined) data.priority = priority;
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({
+        error: "At least one field (title, status, dueDate, priority) is required to update",
+      });
+    }
+
     const updated = await prisma.todo.update({
       where: { id: todo.id },
-      data: { title, completed },
+      data,
     });
 
     res.json({
