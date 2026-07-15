@@ -8,11 +8,23 @@ datasource db {
 }
 
 model UserAccount {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
   name     String?
   password String
   todos    Todo[]
+  projects Project[]
+}
+
+model Project {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  todos       Todo[]
 }
 
 enum TodoStatus {
@@ -31,4 +43,7 @@ model Todo {
   priority  String      @default("medium")
   user      UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
+
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId Int?
 }
