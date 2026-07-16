@@ -1,22 +1,16 @@
 import type { Request, Response } from "express";
-import prisma from "../prismaClient.ts";
+import * as todoService from "../services/todo.service.ts";
 
-// get all todos
 export const getAllTodos = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const todos = await prisma.todo.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    });
-
+    const todos = await todoService.getAllTodos(userId);
     res.json({ todos });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch todos" });
   }
 };
 
-// get a todo by title
 export const getTodoByTitle = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
@@ -25,140 +19,96 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
     if (!title || typeof title !== "string") {
       return res.status(400).json({ error: "Title is required" });
     }
-    // fetch using prisma methods
-    const todo = await prisma.todo.findFirst({
-      where: {
-        title: {
-          equals: title,
-          mode: "insensitive",
-        },
-        userId,
-      },
-    });
 
-    if (!todo) {
-      return res.status(404).json({ error: "Todo not found " });
-    }
-
+    const todo = await todoService.getTodoByTitle(userId, title);
     res.json({ todo });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch the todo" });
+    const message = (error as Error).message;
+    const status = message === "Todo not found" ? 404 : 500;
+    res.status(status).json({ error: message });
   }
 };
 
-const todoStatuses = ["todo", "doing", "done"] as const;
-
-type TodoStatus = (typeof todoStatuses)[number];
-
-// create a new todo
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { title, dueDate, priority, status } = req.body;
+    const { title, dueDate, priority, status, projectId } = req.body;
+
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
     }
 
-    if (status !== undefined && !todoStatuses.includes(status)) {
+    if (status !== undefined && !todoService.todoStatuses.includes(status)) {
       return res.status(400).json({
-        error: `Status must be one of: ${todoStatuses.join(", ")}`,
+        error: `Status must be one of: ${todoService.todoStatuses.join(", ")}`,
       });
     }
 
-    const todo = await prisma.todo.create({
-      data: {
-        title,
-        userId,
-        status: status ?? "todo",
-        dueDate: dueDate ? new Date(dueDate) : null,
-        priority: priority ?? "medium",
-      },
+    const todo = await todoService.createTodo({
+      title,
+      userId,
+      status,
+      dueDate,
+      priority,
+      projectId: projectId ? parseInt(projectId) : undefined,
     });
 
-    res.status(201).json({
-      message: "Todo is created",
-      todo,
-    });
+    res.status(201).json({ message: "Todo is created", todo });
   } catch (error) {
     res.status(500).json({ error: "Failed to create todo" });
   }
 };
 
-// update todo
 export const updateTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid todo ID" });
+
     const { title, status, dueDate, priority } = req.body;
 
-    if (status !== undefined && !todoStatuses.includes(status)) {
+    if (status !== undefined && !todoService.todoStatuses.includes(status)) {
       return res.status(400).json({
-        error: `Status must be one of: ${todoStatuses.join(", ")}`,
+        error: `Status must be one of: ${todoService.todoStatuses.join(", ")}`,
       });
     }
 
-    const todo = await prisma.todo.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!todo || todo.userId !== userId) {
-      return res.status(!todo ? 404 : 403).json({
-        error: !todo
-          ? "Todo not found"
-          : "You are not allowed to modify this todo",
-      });
-    }
-
-    const data: {
-      title?: string;
-      status?: TodoStatus;
-      dueDate?: Date | null;
-      priority?: string;
-    } = {};
-
-    if (title !== undefined) data.title = title;
-    if (status !== undefined) data.status = status;
-    if (dueDate !== undefined) data.dueDate = dueDate ? new Date(dueDate) : null;
-    if (priority !== undefined) data.priority = priority;
-
-    if (Object.keys(data).length === 0) {
+    if (!title && !status && !dueDate && !priority) {
       return res.status(400).json({
-        error: "At least one field (title, status, dueDate, priority) is required to update",
+        error: "At least one field (title, status, dueDate, priority) is required",
       });
     }
 
-    const updated = await prisma.todo.update({
-      where: { id: todo.id },
-      data,
+    const todo = await todoService.updateTodo(userId, id, {
+      title,
+      status,
+      dueDate,
+      priority,
     });
 
-    res.json({
-      message: "Todo is updated",
-      updated,
-    });
+    res.json({ message: "Todo is updated", todo });
   } catch (error) {
-    res.status(500).json({ error: "Failed to update todo." });
+    const message = (error as Error).message;
+    const status = message === "Todo not found" ? 404
+      : message === "Forbidden" ? 403
+      : 500;
+    res.status(status).json({ error: message });
   }
 };
 
-// delele a todo
 export const deleteTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid todo ID" });
 
-    const todo = await prisma.todo.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!todo || todo.userId !== userId) {
-      return res.status(404).json({ error: "Todo not found." });
-    }
-
-    await prisma.todo.delete({ where: { id: parseInt(id) } });
+    await todoService.deleteTodo(userId, id);
     res.json({ message: "Todo deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete todo." });
+    const message = (error as Error).message;
+    const status = message === "Todo not found" ? 404
+      : message === "Forbidden" ? 403
+      : 500;
+    res.status(status).json({ error: message });
   }
 };
