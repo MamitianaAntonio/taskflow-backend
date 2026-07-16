@@ -1,5 +1,5 @@
-import prisma from "../prismaClient";
-import { findProjectOrThrow } from "../utils/project";
+import prisma from "../prismaClient.ts";
+import { findProjectOrThrow } from "../utils/project.ts";
 
 // get all projects
 export async function getAllProjects(userId: number) {
