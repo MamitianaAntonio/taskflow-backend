@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
+  deleteUserAccountController,
   loginUserController,
   registerUserController,
+  updateEmailController,
   updatePasswordController,
   updateUserNameController,
 } from "../controllers/user.controller.ts";
@@ -122,5 +124,54 @@ router.put("/update-name", authMiddleware, updateUserNameController);
  *         description: Password updated successfully
  */
 router.put("/update-password", authMiddleware, updatePasswordController);
+
+/**
+ * @swagger
+ * /api/users/update-email:
+ *   put:
+ *     summary: Update the current user's email
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Email updated successfully
+ *       400:
+ *         description: Invalid email or email already in use
+ *       401:
+ *         description: Unauthorized
+ */
+router.put("/update-email", authMiddleware, updateEmailController);
+
+/**
+ * @swagger
+ * /api/users/delete-account:
+ *   delete:
+ *     summary: Delete the current user's account
+ *     description: Deletes the user and cascades to all their todos and projects.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.delete("/delete-account", authMiddleware, deleteUserAccountController);
 
 export default router;
