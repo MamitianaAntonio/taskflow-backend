@@ -7,6 +7,7 @@ import projectRoutes from "./routes/project.router.ts";
 import notificationRoutes from "./routes/notification.routes.ts";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { startDueDateReminderJob } from "./jobs/dueDateReminder.job.ts";
 
 dotenv.config();
 
@@ -45,3 +46,5 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.listen(PORT, () => {
   console.log("The server was running", PORT);
 });
+
+startDueDateReminderJob();
