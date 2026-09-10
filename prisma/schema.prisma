@@ -8,12 +8,13 @@ datasource db {
 }
 
 model UserAccount {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  name     String?
-  password String
-  todos    Todo[]
-  projects Project[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String?
+  password      String
+  todos         Todo[]
+  projects      Project[]
+  notifications Notification[]
 }
 
 model Project {
@@ -46,4 +47,28 @@ model Todo {
 
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   projectId Int?
+}
+
+enum NotificationType {
+  todo_created
+  todo_updated
+  todo_deleted
+  todo_due_soon
+  project_created
+  project_updated
+  project_deleted
+}
+
+model Notification {
+  id            Int              @id @default(autoincrement())
+  type          NotificationType
+  message       String
+  read          Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  todoId        Int?
+  reminderStage String?
+  user          UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+
+  @@index([todoId, reminderStage])
 }

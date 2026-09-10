@@ -4,8 +4,10 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes.ts";
 import todoRoutes from "./routes/todo.routes.ts";
 import projectRoutes from "./routes/project.router.ts";
+import notificationRoutes from "./routes/notification.routes.ts";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { startDueDateReminderJob } from "./jobs/dueDateReminder.job.ts";
 
 dotenv.config();
 
@@ -18,6 +20,7 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/todos", todoRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const options = {
   definition: {
@@ -43,3 +46,5 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.listen(PORT, () => {
   console.log("The server was running", PORT);
 });
+
+startDueDateReminderJob();
