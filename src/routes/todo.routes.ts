@@ -53,6 +53,8 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *             properties:
  *               title:
  *                 type: string
+ *               description:
+ *                 type: string
  *               status:
  *                 type: string
  *                 enum:
@@ -64,6 +66,8 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *                 format: date-time
  *               priority:
  *                 type: string
+ *               projectId:
+ *                 type: integer
  *             required:
  *               - title
  *     responses:
@@ -94,6 +98,8 @@ router.post("/", authMiddleware, createTodo);
  *             properties:
  *               title:
  *                 type: string
+ *               description:
+ *                 type: string
  *               status:
  *                 type: string
  *                 enum:
@@ -105,6 +111,8 @@ router.post("/", authMiddleware, createTodo);
  *                 format: date-time
  *               priority:
  *                 type: string
+ *               projectId:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Todo updated
