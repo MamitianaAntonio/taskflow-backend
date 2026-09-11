@@ -35,15 +35,16 @@ enum TodoStatus {
 }
 
 model Todo {
-  id        Int         @id @default(autoincrement())
-  title     String
-  status    TodoStatus  @default(todo)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  dueDate   DateTime?
-  priority  String      @default("medium")
-  user      UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
+  id          Int         @id @default(autoincrement())
+  title       String
+  status      TodoStatus  @default(todo)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  dueDate     DateTime?
+  priority    String      @default("medium")
+  description String?
+  user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
 
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   projectId Int?
