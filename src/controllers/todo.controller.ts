@@ -32,7 +32,8 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as number;
-    const { title, dueDate, priority, status, projectId } = req.body;
+    const { title, description, dueDate, priority, status, projectId } =
+      req.body;
 
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
@@ -46,6 +47,7 @@ export const createTodo = async (req: Request, res: Response) => {
 
     const todo = await todoService.createTodo({
       title,
+      description,
       userId,
       status,
       dueDate,
@@ -65,7 +67,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid todo ID" });
 
-    const { title, status, dueDate, priority } = req.body;
+    const { title, description, status, dueDate, priority } = req.body;
 
     if (status !== undefined && !todoService.todoStatuses.includes(status)) {
       return res.status(400).json({
@@ -73,14 +75,16 @@ export const updateTodo = async (req: Request, res: Response) => {
       });
     }
 
-    if (!title && !status && !dueDate && !priority) {
+    if (!title && !description && !status && !dueDate && !priority) {
       return res.status(400).json({
-        error: "At least one field (title, status, dueDate, priority) is required",
+        error:
+          "At least one field (title, description, status, dueDate, priority) is required",
       });
     }
 
     const todo = await todoService.updateTodo(userId, id, {
       title,
+      description,
       status,
       dueDate,
       priority,
@@ -89,9 +93,8 @@ export const updateTodo = async (req: Request, res: Response) => {
     res.json({ message: "Todo is updated", todo });
   } catch (error) {
     const message = (error as Error).message;
-    const status = message === "Todo not found" ? 404
-      : message === "Forbidden" ? 403
-      : 500;
+    const status =
+      message === "Todo not found" ? 404 : message === "Forbidden" ? 403 : 500;
     res.status(status).json({ error: message });
   }
 };
@@ -106,9 +109,8 @@ export const deleteTodo = async (req: Request, res: Response) => {
     res.json({ message: "Todo deleted successfully" });
   } catch (error) {
     const message = (error as Error).message;
-    const status = message === "Todo not found" ? 404
-      : message === "Forbidden" ? 403
-      : 500;
+    const status =
+      message === "Todo not found" ? 404 : message === "Forbidden" ? 403 : 500;
     res.status(status).json({ error: message });
   }
 };

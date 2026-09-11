@@ -23,6 +23,7 @@ export async function getTodoByTitle(userId: number, title: string) {
 
 export async function createTodo(data: {
   title: string;
+  description?: string;
   userId: number;
   status?: TodoStatus;
   dueDate?: string;
@@ -32,6 +33,7 @@ export async function createTodo(data: {
   return prisma.todo.create({
     data: {
       title: data.title,
+      description: data.description,
       userId: data.userId,
       status: data.status ?? "todo",
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
@@ -46,6 +48,7 @@ export async function updateTodo(
   id: number,
   data: {
     title?: string;
+    description?: string;
     status?: TodoStatus;
     dueDate?: string;
     priority?: string;
@@ -57,12 +60,14 @@ export async function updateTodo(
 
   const updateData: {
     title?: string;
+    description?: string;
     status?: TodoStatus;
     dueDate?: Date | null;
     priority?: string;
   } = {};
 
   if (data.title !== undefined) updateData.title = data.title;
+  if (data.description !== undefined) updateData.description = data.description;
   if (data.status !== undefined) updateData.status = data.status;
   if (data.dueDate !== undefined)
     updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
