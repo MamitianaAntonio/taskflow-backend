@@ -8,7 +8,7 @@ datasource db {
 }
 
 model UserAccount {
-  id            Int            @id @default(autoincrement())
+  id            String         @id @default(uuid())
   email         String         @unique
   name          String?
   password      String?
@@ -23,13 +23,13 @@ model UserAccount {
 }
 
 model Project {
-  id          Int         @id @default(autoincrement())
+  id          String      @id @default(uuid())
   name        String
   description String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
+  userId      String
   todos       Todo[]
 }
 
@@ -40,7 +40,7 @@ enum TodoStatus {
 }
 
 model Todo {
-  id          Int         @id @default(autoincrement())
+  id          String      @id @default(uuid())
   title       String
   status      TodoStatus  @default(todo)
   createdAt   DateTime    @default(now())
@@ -49,10 +49,10 @@ model Todo {
   priority    String      @default("medium")
   description String?
   user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
+  userId      String
 
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  projectId Int?
+  projectId String?
 }
 
 enum NotificationType {
@@ -66,15 +66,15 @@ enum NotificationType {
 }
 
 model Notification {
-  id            Int              @id @default(autoincrement())
+  id            String           @id @default(uuid())
   type          NotificationType
   message       String
   read          Boolean          @default(false)
   createdAt     DateTime         @default(now())
-  todoId        Int?
+  todoId        String?
   reminderStage String?
   user          UserAccount      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
+  userId        String
 
   @@index([todoId, reminderStage])
 }

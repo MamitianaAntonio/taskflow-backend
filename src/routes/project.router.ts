@@ -30,7 +30,8 @@ const router = Router();
  *                 type: object
  *                 properties:
  *                   id:
- *                     type: integer
+ *                     type: string
+ *                     format: uuid
  *                   name:
  *                     type: string
  *                   description:
@@ -58,7 +59,8 @@ router.get("/", authMiddleware, getAllProjects);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Project found
@@ -71,7 +73,8 @@ router.get("/", authMiddleware, getAllProjects);
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
+ *                       format: uuid
  *                     name:
  *                       type: string
  *                     description:
@@ -138,7 +141,8 @@ router.post("/", authMiddleware, createProject);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -183,7 +187,8 @@ router.put("/:id", authMiddleware, updateProject);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Project deleted successfully

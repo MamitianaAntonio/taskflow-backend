@@ -67,7 +67,8 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *               priority:
  *                 type: string
  *               projectId:
- *                 type: integer
+ *                 type: string
+ *                 format: uuid
  *             required:
  *               - title
  *     responses:
@@ -112,7 +113,8 @@ router.post("/", authMiddleware, createTodo);
  *               priority:
  *                 type: string
  *               projectId:
- *                 type: integer
+ *                 type: string
+ *                 format: uuid
  *     responses:
  *       200:
  *         description: Todo updated

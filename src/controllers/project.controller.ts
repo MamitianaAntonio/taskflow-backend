@@ -14,8 +14,8 @@ export const getAllProjects = async (req: Request, res: Response) => {
 export const getProjectById = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid project ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "Invalid project ID" });
 
     const project = await projectService.getProjectById(userId, id);
 
@@ -47,8 +47,8 @@ export const createProject = async (req: Request, res: Response) => {
 export const updateProject = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid project ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "Invalid project ID" });
 
     const { name, description } = req.body;
 
@@ -75,8 +75,8 @@ export const updateProject = async (req: Request, res: Response) => {
 export const deleteProject = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid project ID" });
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "Invalid project ID" });
 
     await projectService.deleteProject(userId, id);
     res.json({ message: "Project deleted successfully" });
