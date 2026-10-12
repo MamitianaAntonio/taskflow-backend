@@ -71,6 +71,7 @@ export async function updateTodo(
     status?: TodoStatus;
     dueDate?: string;
     priority?: string;
+    projectId?: string | null;
   },
 ) {
   const todo = await prisma.todo.findUnique({ where: { id } });
@@ -83,6 +84,7 @@ export async function updateTodo(
     status?: TodoStatus;
     dueDate?: Date | null;
     priority?: string;
+    projectId?: string | null;
   } = {};
 
   if (data.title !== undefined) updateData.title = data.title;
@@ -91,6 +93,18 @@ export async function updateTodo(
   if (data.dueDate !== undefined)
     updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
   if (data.priority !== undefined) updateData.priority = data.priority;
+  if (data.projectId !== undefined) {
+    if (data.projectId === null) {
+      updateData.projectId = null;
+    } else {
+      const project = await prisma.project.findUnique({
+        where: { id: data.projectId },
+      });
+      if (!project) throw new Error("Project not found");
+      if (project.userId !== userId) throw new Error("Forbidden");
+      updateData.projectId = data.projectId;
+    }
+  }
 
   return prisma.todo.update({ where: { id }, data: updateData });
 }
