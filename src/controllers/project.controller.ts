@@ -29,12 +29,13 @@ export const getProjectById = async (req: Request, res: Response) => {
 export const createProject = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { name, description } = req.body;
+    const { name, description, dueDate } = req.body;
 
     if (!name) return res.status(400).json({ error: "Name is required " });
     const project = await projectService.createProject({
       name,
       description,
+      dueDate,
       userId,
     });
 
@@ -50,18 +51,19 @@ export const updateProject = async (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id) return res.status(400).json({ error: "Invalid project ID" });
 
-    const { name, description } = req.body;
+    const { name, description, dueDate } = req.body;
 
-    if (!name && !description) {
+    if (!name && !description && dueDate === undefined) {
       return res
         .status(400)
-        .json({ error: "At least name or description is required" });
+        .json({ error: "At least one field (name, description, dueDate) is required" });
     }
 
-    const data: { name?: string; description?: string } = {};
+    const data: { name?: string; description?: string; dueDate?: string | null } = {};
 
     if (name !== undefined) data.name = name;
     if (description !== undefined) data.description = description;
+    if (dueDate !== undefined) data.dueDate = dueDate;
 
     const project = await projectService.updateProject(userId, id, data);
     res.json({ message: "Project updated", project });
