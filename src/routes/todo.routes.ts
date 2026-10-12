@@ -1,9 +1,12 @@
 import { Router } from "express";
 import {
+  addChecklistItem,
   createTodo,
+  deleteChecklistItem,
   deleteTodo,
   getAllTodos,
   getTodoByTitle,
+  updateChecklistItem,
   updateTodo,
 } from "../controllers/todo.controller.ts";
 import authMiddleware from "../middleware/auth.middleware.ts";
@@ -67,6 +70,9 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *               priority:
  *                 type: string
  *               projectId:
+ *                 type: string
+ *                 format: uuid
+ *               parentId:
  *                 type: string
  *                 format: uuid
  *             required:
@@ -139,5 +145,94 @@ router.put("/:id", authMiddleware, updateTodo);
  *         description: Todo deleted
  */
 router.delete("/:id", authMiddleware, deleteTodo);
+
+/**
+ * @swagger
+ * /api/todos/{id}/checklist:
+ *   post:
+ *     summary: Add a checklist item to a todo
+ *     tags:
+ *       - Todos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *             required:
+ *               - text
+ *     responses:
+ *       201:
+ *         description: Checklist item added
+ */
+router.post("/:id/checklist", authMiddleware, addChecklistItem);
+
+/**
+ * @swagger
+ * /api/todos/{id}/checklist/{itemId}:
+ *   patch:
+ *     summary: Update a checklist item (text and/or done)
+ *     tags:
+ *       - Todos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *               done:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Checklist item updated
+ */
+router.patch("/:id/checklist/:itemId", authMiddleware, updateChecklistItem);
+
+/**
+ * @swagger
+ * /api/todos/{id}/checklist/{itemId}:
+ *   delete:
+ *     summary: Delete a checklist item from a todo
+ *     tags:
+ *       - Todos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Checklist item deleted
+ */
+router.delete("/:id/checklist/:itemId", authMiddleware, deleteChecklistItem);
 
 export default router;
