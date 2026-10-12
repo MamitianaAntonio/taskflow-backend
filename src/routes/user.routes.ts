@@ -3,7 +3,9 @@ import {
   deleteUserAccountController,
   loginUserController,
   registerUserController,
+  updateAvatarController,
   updateEmailController,
+  updateGenderController,
   updatePasswordController,
   updateUserNameController,
 } from "../controllers/user.controller.ts";
@@ -155,6 +157,69 @@ router.put("/update-password", authMiddleware, updatePasswordController);
  *         description: Unauthorized
  */
 router.put("/update-email", authMiddleware, updateEmailController);
+
+/**
+ * @swagger
+ * /api/users/update-gender:
+ *   put:
+ *     summary: Update the current user's gender
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female]
+ *                 nullable: true
+ *             required:
+ *               - gender
+ *     responses:
+ *       200:
+ *         description: Gender updated successfully
+ *       400:
+ *         description: Invalid gender
+ *       401:
+ *         description: Unauthorized
+ */
+router.put("/update-gender", authMiddleware, updateGenderController);
+
+/**
+ * @swagger
+ * /api/users/update-avatar:
+ *   put:
+ *     summary: Update the current user's avatar variant
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatarId:
+ *                 type: integer
+ *                 minimum: 0
+ *             required:
+ *               - avatarId
+ *     responses:
+ *       200:
+ *         description: Avatar updated successfully
+ *       400:
+ *         description: Invalid avatar id
+ *       401:
+ *         description: Unauthorized
+ */
+router.put("/update-avatar", authMiddleware, updateAvatarController);
 
 /**
  * @swagger

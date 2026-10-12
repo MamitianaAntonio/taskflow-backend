@@ -3,7 +3,9 @@ import {
   deleteUserAccount,
   loginUser,
   registerUser,
+  updateUserAvatar,
   updateUserEmail,
+  updateUserGender,
   updateUserName,
   updateUserPassword,
 } from "../services/user.service.ts";
@@ -20,6 +22,8 @@ export const registerUserController = async (req: Request, res: Response) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        gender: user.gender,
+        avatarId: user.avatarId,
       },
     });
   } catch (error) {
@@ -39,6 +43,8 @@ export const loginUserController = async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        gender: user.gender,
+        avatarId: user.avatarId,
       },
     });
   } catch (error) {
@@ -109,6 +115,62 @@ export const updateEmailController = async (req: Request, res: Response) => {
     res.status(400).json({
       error: (error as Error).message,
     });
+  }
+};
+
+// update gender (used to style the avatar)
+export const updateGenderController = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const { gender } = req.body;
+
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (gender !== null && gender !== "male" && gender !== "female") {
+      return res.status(400).json({ error: "Gender must be 'male' or 'female'" });
+    }
+
+    const updatedUser = await updateUserGender(userId, gender);
+    res.json({
+      message: "Gender updated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        gender: updatedUser.gender,
+        avatarId: updatedUser.avatarId,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+};
+
+// update avatar variant (used to pick the avatar)
+export const updateAvatarController = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const { avatarId } = req.body;
+
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!Number.isInteger(avatarId) || avatarId < 0) {
+      return res
+        .status(400)
+        .json({ error: "Avatar id must be a positive integer" });
+    }
+
+    const updatedUser = await updateUserAvatar(userId, avatarId);
+    res.json({
+      message: "Avatar updated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        gender: updatedUser.gender,
+        avatarId: updatedUser.avatarId,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
