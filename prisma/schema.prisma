@@ -11,7 +11,10 @@ model UserAccount {
   id            Int            @id @default(autoincrement())
   email         String         @unique
   name          String?
-  password      String
+  password      String?
+  googleId      String?        @unique
+  picture       String?
+  authSource    String         @default("credentials")
   todos         Todo[]
   projects      Project[]
   notifications Notification[]
