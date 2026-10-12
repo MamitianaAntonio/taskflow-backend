@@ -4,10 +4,9 @@ export const todoStatuses = ["todo", "doing", "done"] as const;
 export type TodoStatus = (typeof todoStatuses)[number];
 
 // Relations embedded on every todo returned to the client so the UI can
-// render subtask/checklist progress without extra requests.
+// render subtask progress without extra requests.
 const todoRelations = {
   subtasks: { orderBy: { createdAt: "asc" as const } },
-  checklist: { orderBy: { position: "asc" as const } },
 };
 
 export async function getAllTodos(userId: string) {
@@ -102,63 +101,4 @@ export async function deleteTodo(userId: string, id: string) {
   if (todo.userId !== userId) throw new Error("Forbidden");
 
   return prisma.todo.delete({ where: { id } });
-}
-
-// --- Checklist items -------------------------------------------------------
-
-async function findOwnedChecklistItem(
-  userId: string,
-  todoId: string,
-  itemId: string,
-) {
-  const item = await prisma.checklistItem.findUnique({
-    where: { id: itemId },
-    include: { todo: true },
-  });
-  if (!item || item.todoId !== todoId) throw new Error("Checklist item not found");
-  if (item.todo.userId !== userId) throw new Error("Forbidden");
-  return item;
-}
-
-export async function addChecklistItem(
-  userId: string,
-  todoId: string,
-  text: string,
-) {
-  const todo = await prisma.todo.findUnique({ where: { id: todoId } });
-  if (!todo) throw new Error("Todo not found");
-  if (todo.userId !== userId) throw new Error("Forbidden");
-
-  const last = await prisma.checklistItem.findFirst({
-    where: { todoId },
-    orderBy: { position: "desc" },
-  });
-
-  return prisma.checklistItem.create({
-    data: { text, todoId, position: (last?.position ?? -1) + 1 },
-  });
-}
-
-export async function updateChecklistItem(
-  userId: string,
-  todoId: string,
-  itemId: string,
-  data: { text?: string; done?: boolean },
-) {
-  await findOwnedChecklistItem(userId, todoId, itemId);
-
-  const updateData: { text?: string; done?: boolean } = {};
-  if (data.text !== undefined) updateData.text = data.text;
-  if (data.done !== undefined) updateData.done = data.done;
-
-  return prisma.checklistItem.update({ where: { id: itemId }, data: updateData });
-}
-
-export async function deleteChecklistItem(
-  userId: string,
-  todoId: string,
-  itemId: string,
-) {
-  await findOwnedChecklistItem(userId, todoId, itemId);
-  return prisma.checklistItem.delete({ where: { id: itemId } });
 }

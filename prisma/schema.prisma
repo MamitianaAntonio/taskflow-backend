@@ -58,21 +58,7 @@ model Todo {
   parentId String?
   subtasks Todo[]  @relation("Subtasks")
 
-  checklist ChecklistItem[]
-
   @@index([parentId])
-}
-
-model ChecklistItem {
-  id        String   @id @default(uuid())
-  text      String
-  done      Boolean  @default(false)
-  position  Int      @default(0)
-  createdAt DateTime @default(now())
-  todo      Todo     @relation(fields: [todoId], references: [id], onDelete: Cascade)
-  todoId    String
-
-  @@index([todoId])
 }
 
 enum NotificationType {
