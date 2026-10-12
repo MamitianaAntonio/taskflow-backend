@@ -2,7 +2,7 @@ import prisma from "../prismaClient.ts";
 import { findProjectOrThrow } from "../utils/project.ts";
 
 // get all projects
-export async function getAllProjects(userId: number) {
+export async function getAllProjects(userId: string) {
   return prisma.project.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -10,7 +10,7 @@ export async function getAllProjects(userId: number) {
 }
 
 // get specifics project
-export async function getProjectById(userId: number, id: number) {
+export async function getProjectById(userId: string, id: string) {
   return prisma.project.findFirst({
     where: { id, userId },
     include: { todos: true },
@@ -21,15 +21,15 @@ export async function getProjectById(userId: number, id: number) {
 export async function createProject(data: {
   name: string;
   description?: string;
-  userId: number;
+  userId: string;
 }) {
   return prisma.project.create({ data });
 }
 
 // update project
 export async function updateProject(
-  userId: number,
-  id: number,
+  userId: string,
+  id: string,
   data: {
     name?: string;
     description?: string;
@@ -40,7 +40,7 @@ export async function updateProject(
 }
 
 // delete project
-export async function deleteProject(userId: number, id: number) {
+export async function deleteProject(userId: string, id: string) {
   await findProjectOrThrow(userId, id);
   return prisma.project.delete({ where: { id } });
 }

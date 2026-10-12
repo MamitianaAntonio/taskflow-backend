@@ -1,8 +1,8 @@
 import * as notificationService from "../services/notification.service.ts";
 
 export async function notifyTodoDueSoon(data: {
-  userId: number;
-  todoId: number;
+  userId: string;
+  todoId: string;
   todoTitle: string;
   stage: "24h" | "30min" | "overdue";
 }) {

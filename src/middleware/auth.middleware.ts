@@ -4,7 +4,7 @@ import { verifyToken } from "../utils/jwt.ts";
 declare global {
   namespace Express {
     interface Request {
-      user?: { userId: number };
+      user?: { userId: string };
     }
   }
 }
@@ -24,7 +24,7 @@ export default function authMiddleware(
   const token = header.split(" ")[1];
 
   try {
-    const decoded = verifyToken(token) as { userId: number };
+    const decoded = verifyToken(token) as { userId: string };
     req.user = decoded;
     next();
   } catch (error) {

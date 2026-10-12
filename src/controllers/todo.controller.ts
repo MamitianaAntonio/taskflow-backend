@@ -3,7 +3,7 @@ import * as todoService from "../services/todo.service.ts";
 
 export const getAllTodos = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const todos = await todoService.getAllTodos(userId);
     res.json({ todos });
   } catch (error) {
@@ -13,7 +13,7 @@ export const getAllTodos = async (req: Request, res: Response) => {
 
 export const getTodoByTitle = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const { title } = req.query;
 
     if (!title || typeof title !== "string") {
@@ -31,7 +31,7 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
 
 export const createTodo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const { title, description, dueDate, priority, status, projectId } =
       req.body;
 
@@ -52,7 +52,7 @@ export const createTodo = async (req: Request, res: Response) => {
       status,
       dueDate,
       priority,
-      projectId: projectId ? parseInt(projectId) : undefined,
+      projectId: projectId ? String(projectId) : undefined,
     });
 
     res.status(201).json({ message: "Todo is created", todo });
@@ -63,9 +63,9 @@ export const createTodo = async (req: Request, res: Response) => {
 
 export const updateTodo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid todo ID" });
+    const userId = (req as any).user.userId as string;
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "Invalid todo ID" });
 
     const { title, description, status, dueDate, priority } = req.body;
 
@@ -101,9 +101,9 @@ export const updateTodo = async (req: Request, res: Response) => {
 
 export const deleteTodo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid todo ID" });
+    const userId = (req as any).user.userId as string;
+    const id = req.params.id;
+    if (!id) return res.status(400).json({ error: "Invalid todo ID" });
 
     await todoService.deleteTodo(userId, id);
     res.json({ message: "Todo deleted successfully" });

@@ -3,7 +3,7 @@ import * as notificationService from "../services/notification.service.ts";
 
 export const getAllNotifications = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const notifications = await notificationService.getAllNotifications(userId);
     res.json({ notifications });
   } catch (error) {
@@ -13,7 +13,7 @@ export const getAllNotifications = async (req: Request, res: Response) => {
 
 export const getUnreadNotifications = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const notifications =
       await notificationService.getUnreadNotifications(userId);
     res.json({ notifications });
@@ -24,7 +24,7 @@ export const getUnreadNotifications = async (req: Request, res: Response) => {
 
 export const getUnreadCount = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     const count = await notificationService.getUnreadCount(userId);
     res.json({ count });
   } catch (error) {
@@ -34,9 +34,9 @@ export const getUnreadCount = async (req: Request, res: Response) => {
 
 export const markAsRead = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
-    const id = parseInt(req.params.id);
-    if (isNaN(id))
+    const userId = (req as any).user.userId as string;
+    const id = req.params.id;
+    if (!id)
       return res.status(400).json({ error: "Invalid notification ID" });
 
     const notification = await notificationService.markAsRead(userId, id);
@@ -55,7 +55,7 @@ export const markAsRead = async (req: Request, res: Response) => {
 
 export const markAllAsRead = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     await notificationService.markAllAsRead(userId);
     res.json({ message: "All notifications marked as read" });
   } catch (error) {
@@ -65,9 +65,9 @@ export const markAllAsRead = async (req: Request, res: Response) => {
 
 export const deleteNotification = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
-    const id = parseInt(req.params.id);
-    if (isNaN(id))
+    const userId = (req as any).user.userId as string;
+    const id = req.params.id;
+    if (!id)
       return res.status(400).json({ error: "Invalid notification ID" });
 
     await notificationService.deleteNotification(userId, id);
@@ -86,7 +86,7 @@ export const deleteNotification = async (req: Request, res: Response) => {
 
 export const deleteAllNotifications = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.userId as number;
+    const userId = (req as any).user.userId as string;
     await notificationService.deleteAllNotifications(userId);
     res.json({ message: "All notifications deleted" });
   } catch (error) {

@@ -3,14 +3,14 @@ import prisma from "../prismaClient.ts";
 export const todoStatuses = ["todo", "doing", "done"] as const;
 export type TodoStatus = (typeof todoStatuses)[number];
 
-export async function getAllTodos(userId: number) {
+export async function getAllTodos(userId: string) {
   return prisma.todo.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export async function getTodoByTitle(userId: number, title: string) {
+export async function getTodoByTitle(userId: string, title: string) {
   const todo = await prisma.todo.findFirst({
     where: {
       title: { equals: title, mode: "insensitive" },
@@ -24,11 +24,11 @@ export async function getTodoByTitle(userId: number, title: string) {
 export async function createTodo(data: {
   title: string;
   description?: string;
-  userId: number;
+  userId: string;
   status?: TodoStatus;
   dueDate?: string;
   priority?: string;
-  projectId?: number;
+  projectId?: string;
 }) {
   return prisma.todo.create({
     data: {
@@ -44,8 +44,8 @@ export async function createTodo(data: {
 }
 
 export async function updateTodo(
-  userId: number,
-  id: number,
+  userId: string,
+  id: string,
   data: {
     title?: string;
     description?: string;
@@ -76,7 +76,7 @@ export async function updateTodo(
   return prisma.todo.update({ where: { id }, data: updateData });
 }
 
-export async function deleteTodo(userId: number, id: number) {
+export async function deleteTodo(userId: string, id: string) {
   const todo = await prisma.todo.findUnique({ where: { id } });
   if (!todo) throw new Error("Todo not found");
   if (todo.userId !== userId) throw new Error("Forbidden");

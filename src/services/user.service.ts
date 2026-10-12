@@ -95,7 +95,7 @@ export async function googleAuthenticate(credential: string) {
 }
 
 // update user name
-export async function updateUserName(userId: number, name: string) {
+export async function updateUserName(userId: string, name: string) {
   return await prisma.userAccount.update({
     where: { id: userId },
     data: { name },
@@ -103,7 +103,7 @@ export async function updateUserName(userId: number, name: string) {
 }
 
 // update user gender (used to style the avatar)
-export async function updateUserGender(userId: number, gender: string | null) {
+export async function updateUserGender(userId: string, gender: string | null) {
   return await prisma.userAccount.update({
     where: { id: userId },
     data: { gender },
@@ -111,7 +111,7 @@ export async function updateUserGender(userId: number, gender: string | null) {
 }
 
 // update the chosen avatar variant
-export async function updateUserAvatar(userId: number, avatarId: number) {
+export async function updateUserAvatar(userId: string, avatarId: number) {
   return await prisma.userAccount.update({
     where: { id: userId },
     data: { avatarId },
@@ -120,7 +120,7 @@ export async function updateUserAvatar(userId: number, avatarId: number) {
 
 // change password
 export async function updateUserPassword(
-  userId: number,
+  userId: string,
   oldPassword: string,
   newPassword: string,
 ) {
@@ -145,7 +145,7 @@ export async function updateUserPassword(
 }
 
 // update user email
-export async function updateUserEmail(userId: number, email: string) {
+export async function updateUserEmail(userId: string, email: string) {
   const existing = await prisma.userAccount.findUnique({ where: { email } });
 
   if (existing && existing.id !== userId) {
@@ -159,6 +159,6 @@ export async function updateUserEmail(userId: number, email: string) {
 }
 
 // delete user account
-export async function deleteUserAccount(userId: number) {
+export async function deleteUserAccount(userId: string) {
   return await prisma.userAccount.delete({ where: { id: userId } });
 }

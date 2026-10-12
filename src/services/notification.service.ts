@@ -11,31 +11,31 @@ export const notificationTypes = [
 ] as const;
 export type NotificationType = (typeof notificationTypes)[number];
 
-export async function getAllNotifications(userId: number) {
+export async function getAllNotifications(userId: string) {
   return prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export async function getUnreadNotifications(userId: number) {
+export async function getUnreadNotifications(userId: string) {
   return prisma.notification.findMany({
     where: { userId, read: false },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export async function getUnreadCount(userId: number) {
+export async function getUnreadCount(userId: string) {
   return prisma.notification.count({
     where: { userId, read: false },
   });
 }
 
 export async function createNotification(data: {
-  userId: number;
+  userId: string;
   type: NotificationType;
   message: string;
-  todoId?: number;
+  todoId?: string;
   reminderStage?: string;
 }) {
   return prisma.notification.create({
@@ -50,7 +50,7 @@ export async function createNotification(data: {
 }
 
 export async function hasDueSoonReminder(
-  todoId: number,
+  todoId: string,
   reminderStage: string,
 ) {
   const existing = await prisma.notification.findFirst({
@@ -63,7 +63,7 @@ export async function hasDueSoonReminder(
   return existing !== null;
 }
 
-export async function markAsRead(userId: number, id: number) {
+export async function markAsRead(userId: string, id: string) {
   const notification = await prisma.notification.findUnique({ where: { id } });
   if (!notification) throw new Error("Notification not found");
   if (notification.userId !== userId) throw new Error("Forbidden");
@@ -74,14 +74,14 @@ export async function markAsRead(userId: number, id: number) {
   });
 }
 
-export async function markAllAsRead(userId: number) {
+export async function markAllAsRead(userId: string) {
   return prisma.notification.updateMany({
     where: { userId, read: false },
     data: { read: true },
   });
 }
 
-export async function deleteNotification(userId: number, id: number) {
+export async function deleteNotification(userId: string, id: string) {
   const notification = await prisma.notification.findUnique({ where: { id } });
   if (!notification) throw new Error("Notification not found");
   if (notification.userId !== userId) throw new Error("Forbidden");
@@ -89,7 +89,7 @@ export async function deleteNotification(userId: number, id: number) {
   return prisma.notification.delete({ where: { id } });
 }
 
-export async function deleteAllNotifications(userId: number) {
+export async function deleteAllNotifications(userId: string) {
   return prisma.notification.deleteMany({
     where: { userId },
   });
