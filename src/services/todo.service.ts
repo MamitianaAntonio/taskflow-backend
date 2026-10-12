@@ -3,10 +3,17 @@ import prisma from "../prismaClient.ts";
 export const todoStatuses = ["todo", "doing", "done"] as const;
 export type TodoStatus = (typeof todoStatuses)[number];
 
+// Relations embedded on every todo returned to the client so the UI can
+// render subtask progress without extra requests.
+const todoRelations = {
+  subtasks: { orderBy: { createdAt: "asc" as const } },
+};
+
 export async function getAllTodos(userId: string) {
   return prisma.todo.findMany({
-    where: { userId },
+    where: { userId, parentId: null },
     orderBy: { createdAt: "desc" },
+    include: todoRelations,
   });
 }
 
@@ -29,7 +36,17 @@ export async function createTodo(data: {
   dueDate?: string;
   priority?: string;
   projectId?: string;
+  parentId?: string;
 }) {
+  if (data.parentId) {
+    const parent = await prisma.todo.findUnique({
+      where: { id: data.parentId },
+    });
+    if (!parent) throw new Error("Parent todo not found");
+    if (parent.userId !== data.userId) throw new Error("Forbidden");
+    if (parent.parentId) throw new Error("Subtasks cannot be nested further");
+  }
+
   return prisma.todo.create({
     data: {
       title: data.title,
@@ -39,7 +56,9 @@ export async function createTodo(data: {
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       priority: data.priority ?? "medium",
       projectId: data.projectId ?? null,
+      parentId: data.parentId ?? null,
     },
+    include: todoRelations,
   });
 }
 

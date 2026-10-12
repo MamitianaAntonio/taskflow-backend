@@ -69,6 +69,9 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *               projectId:
  *                 type: string
  *                 format: uuid
+ *               parentId:
+ *                 type: string
+ *                 format: uuid
  *             required:
  *               - title
  *     responses:

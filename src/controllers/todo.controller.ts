@@ -32,7 +32,7 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as string;
-    const { title, description, dueDate, priority, status, projectId } =
+    const { title, description, dueDate, priority, status, projectId, parentId } =
       req.body;
 
     if (!title) {
@@ -53,11 +53,21 @@ export const createTodo = async (req: Request, res: Response) => {
       dueDate,
       priority,
       projectId: projectId ? String(projectId) : undefined,
+      parentId: parentId ? String(parentId) : undefined,
     });
 
     res.status(201).json({ message: "Todo is created", todo });
   } catch (error) {
-    res.status(500).json({ error: "Failed to create todo" });
+    const message = (error as Error).message;
+    const status =
+      message === "Parent todo not found"
+        ? 404
+        : message === "Forbidden"
+          ? 403
+          : message === "Subtasks cannot be nested further"
+            ? 400
+            : 500;
+    res.status(status).json({ error: status === 500 ? "Failed to create todo" : message });
   }
 };
 

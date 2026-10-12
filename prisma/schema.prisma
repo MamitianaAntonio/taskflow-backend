@@ -53,6 +53,12 @@ model Todo {
 
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   projectId String?
+
+  parent   Todo?   @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  subtasks Todo[]  @relation("Subtasks")
+
+  @@index([parentId])
 }
 
 enum NotificationType {
