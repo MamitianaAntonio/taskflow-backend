@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes.ts";
+import authRoutes from "./routes/auth.routes.ts";
 import todoRoutes from "./routes/todo.routes.ts";
 import projectRoutes from "./routes/project.router.ts";
 import notificationRoutes from "./routes/notification.routes.ts";
@@ -17,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/todos", todoRoutes);
 app.use("/api/projects", projectRoutes);
