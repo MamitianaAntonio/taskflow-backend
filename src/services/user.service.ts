@@ -102,6 +102,22 @@ export async function updateUserName(userId: number, name: string) {
   });
 }
 
+// update user gender (used to style the avatar)
+export async function updateUserGender(userId: number, gender: string | null) {
+  return await prisma.userAccount.update({
+    where: { id: userId },
+    data: { gender },
+  });
+}
+
+// update the chosen avatar variant
+export async function updateUserAvatar(userId: number, avatarId: number) {
+  return await prisma.userAccount.update({
+    where: { id: userId },
+    data: { avatarId },
+  });
+}
+
 // change password
 export async function updateUserPassword(
   userId: number,

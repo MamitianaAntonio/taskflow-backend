@@ -20,6 +20,8 @@ export const googleAuthController = async (req: Request, res: Response) => {
         email: user.email,
         name: user.name,
         picture: user.picture,
+        gender: user.gender,
+        avatarId: user.avatarId,
       },
     });
   } catch (error) {
