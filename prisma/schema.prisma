@@ -26,6 +26,7 @@ model Project {
   id          String      @id @default(uuid())
   name        String
   description String?
+  dueDate     DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   user        UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)

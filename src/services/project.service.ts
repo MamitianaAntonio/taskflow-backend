@@ -21,9 +21,17 @@ export async function getProjectById(userId: string, id: string) {
 export async function createProject(data: {
   name: string;
   description?: string;
+  dueDate?: string;
   userId: string;
 }) {
-  return prisma.project.create({ data });
+  return prisma.project.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      dueDate: data.dueDate ? new Date(data.dueDate) : null,
+      userId: data.userId,
+    },
+  });
 }
 
 // update project
@@ -33,10 +41,23 @@ export async function updateProject(
   data: {
     name?: string;
     description?: string;
+    dueDate?: string | null;
   },
 ) {
   await findProjectOrThrow(userId, id);
-  return prisma.project.update({ where: { id }, data });
+
+  const updateData: {
+    name?: string;
+    description?: string;
+    dueDate?: Date | null;
+  } = {};
+
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.dueDate !== undefined)
+    updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
+
+  return prisma.project.update({ where: { id }, data: updateData });
 }
 
 // delete project

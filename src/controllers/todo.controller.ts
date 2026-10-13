@@ -77,7 +77,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id) return res.status(400).json({ error: "Invalid todo ID" });
 
-    const { title, description, status, dueDate, priority } = req.body;
+    const { title, description, status, dueDate, priority, projectId } = req.body;
 
     if (status !== undefined && !todoService.todoStatuses.includes(status)) {
       return res.status(400).json({
@@ -85,10 +85,17 @@ export const updateTodo = async (req: Request, res: Response) => {
       });
     }
 
-    if (!title && !description && !status && !dueDate && !priority) {
+    if (
+      !title &&
+      !description &&
+      !status &&
+      !dueDate &&
+      !priority &&
+      projectId === undefined
+    ) {
       return res.status(400).json({
         error:
-          "At least one field (title, description, status, dueDate, priority) is required",
+          "At least one field (title, description, status, dueDate, priority, projectId) is required",
       });
     }
 
@@ -98,13 +105,21 @@ export const updateTodo = async (req: Request, res: Response) => {
       status,
       dueDate,
       priority,
+      projectId:
+        projectId === undefined || projectId === null
+          ? projectId
+          : String(projectId),
     });
 
     res.json({ message: "Todo is updated", todo });
   } catch (error) {
     const message = (error as Error).message;
     const status =
-      message === "Todo not found" ? 404 : message === "Forbidden" ? 403 : 500;
+      message === "Todo not found" || message === "Project not found"
+        ? 404
+        : message === "Forbidden"
+          ? 403
+          : 500;
     res.status(status).json({ error: message });
   }
 };
