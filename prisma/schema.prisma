@@ -59,7 +59,21 @@ model Todo {
   parentId String?
   subtasks Todo[]  @relation("Subtasks")
 
+  // Recurrence: "none" for a one-off task. The anchor day keeps a monthly
+  // task on the day the user picked, even in a shorter month.
+  repeat          RepeatRule @default(none)
+  repeatAnchorDay Int?
+
   @@index([parentId])
+  @@index([repeat])
+}
+
+enum RepeatRule {
+  none
+  daily
+  weekly
+  monthly
+  yearly
 }
 
 enum NotificationType {
