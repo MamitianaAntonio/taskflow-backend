@@ -40,7 +40,7 @@ const router = Router();
  *               - password
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully, returns a session token like /login
  */
 router.post("/register", registerUserController);
 

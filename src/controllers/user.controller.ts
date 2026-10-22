@@ -15,9 +15,10 @@ import { error } from "console";
 export const registerUserController = async (req: Request, res: Response) => {
   try {
     const { email, password, name } = req.body;
-    const user = await registerUser(email, password, name);
+    const { token, user } = await registerUser(email, password, name);
     res.status(201).json({
       message: "User registered successfully",
+      token,
       user: {
         id: user.id,
         name: user.name,
