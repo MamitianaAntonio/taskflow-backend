@@ -100,11 +100,11 @@ export const updateTodo = async (req: Request, res: Response) => {
     }
 
     if (
-      !title &&
-      !description &&
-      !status &&
-      !dueDate &&
-      !priority &&
+      title === undefined &&
+      description === undefined &&
+      status === undefined &&
+      dueDate === undefined &&
+      priority === undefined &&
       projectId === undefined &&
       repeat === undefined
     ) {
