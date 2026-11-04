@@ -131,7 +131,11 @@ export async function updateTodo(
     updateData.repeatAnchorDay = null;
   }
 
-  const updated = await prisma.todo.update({ where: { id }, data: updateData });
+  const updated = await prisma.todo.update({
+    where: { id },
+    data: updateData,
+    include: todoRelations,
+  });
 
   // Completing a recurring task schedules its next occurrence.
   if (data.status === "done" && todo.status !== "done" && updated.repeat !== "none") {
