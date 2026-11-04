@@ -72,6 +72,14 @@ router.get("/title", authMiddleware, getTodoByTitle);
  *               parentId:
  *                 type: string
  *                 format: uuid
+ *               repeat:
+ *                 type: string
+ *                 enum:
+ *                   - none
+ *                   - daily
+ *                   - weekly
+ *                   - monthly
+ *                   - yearly
  *             required:
  *               - title
  *     responses:
@@ -118,6 +126,14 @@ router.post("/", authMiddleware, createTodo);
  *               projectId:
  *                 type: string
  *                 format: uuid
+ *               repeat:
+ *                 type: string
+ *                 enum:
+ *                   - none
+ *                   - daily
+ *                   - weekly
+ *                   - monthly
+ *                   - yearly
  *     responses:
  *       200:
  *         description: Todo updated

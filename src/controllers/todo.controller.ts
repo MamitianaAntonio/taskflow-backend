@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import * as todoService from "../services/todo.service.ts";
+import { isRepeatRule, repeatRules } from "../utils/recurrence.ts";
 
 export const getAllTodos = async (req: Request, res: Response) => {
   try {
@@ -32,7 +33,7 @@ export const getTodoByTitle = async (req: Request, res: Response) => {
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId as string;
-    const { title, description, dueDate, priority, status, projectId, parentId } =
+    const { title, description, dueDate, priority, status, projectId, parentId, repeat } =
       req.body;
 
     if (!title) {
@@ -45,6 +46,12 @@ export const createTodo = async (req: Request, res: Response) => {
       });
     }
 
+    if (repeat !== undefined && !isRepeatRule(repeat)) {
+      return res.status(400).json({
+        error: `Repeat must be one of: ${repeatRules.join(", ")}`,
+      });
+    }
+
     const todo = await todoService.createTodo({
       title,
       description,
@@ -54,6 +61,7 @@ export const createTodo = async (req: Request, res: Response) => {
       priority,
       projectId: projectId ? String(projectId) : undefined,
       parentId: parentId ? String(parentId) : undefined,
+      repeat,
     });
 
     res.status(201).json({ message: "Todo is created", todo });
@@ -77,7 +85,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id) return res.status(400).json({ error: "Invalid todo ID" });
 
-    const { title, description, status, dueDate, priority, projectId } = req.body;
+    const { title, description, status, dueDate, priority, projectId, repeat } = req.body;
 
     if (status !== undefined && !todoService.todoStatuses.includes(status)) {
       return res.status(400).json({
@@ -85,17 +93,24 @@ export const updateTodo = async (req: Request, res: Response) => {
       });
     }
 
+    if (repeat !== undefined && !isRepeatRule(repeat)) {
+      return res.status(400).json({
+        error: `Repeat must be one of: ${repeatRules.join(", ")}`,
+      });
+    }
+
     if (
-      !title &&
-      !description &&
-      !status &&
-      !dueDate &&
-      !priority &&
-      projectId === undefined
+      title === undefined &&
+      description === undefined &&
+      status === undefined &&
+      dueDate === undefined &&
+      priority === undefined &&
+      projectId === undefined &&
+      repeat === undefined
     ) {
       return res.status(400).json({
         error:
-          "At least one field (title, description, status, dueDate, priority, projectId) is required",
+          "At least one field (title, description, status, dueDate, priority, projectId, repeat) is required",
       });
     }
 
@@ -105,6 +120,7 @@ export const updateTodo = async (req: Request, res: Response) => {
       status,
       dueDate,
       priority,
+      repeat,
       projectId:
         projectId === undefined || projectId === null
           ? projectId
