@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.ts";
 import todoRoutes from "./routes/todo.routes.ts";
 import projectRoutes from "./routes/project.router.ts";
 import notificationRoutes from "./routes/notification.routes.ts";
+import healthRoutes from "./routes/health.routes.ts";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { startDueDateReminderJob } from "./jobs/dueDateReminder.job.ts";
@@ -23,6 +24,7 @@ app.use(
   }),
 );
 
+app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/todos", todoRoutes);
